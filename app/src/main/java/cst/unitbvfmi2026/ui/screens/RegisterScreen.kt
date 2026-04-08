@@ -39,7 +39,8 @@ import cst.unitbvfmi2026.util.isValidEmail
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
-    onLoginClick: () -> Unit = {}
+    onLoginClick: () -> Unit = {},
+    onRegisterClick: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -155,7 +156,7 @@ fun RegisterScreen(
                     emailError = "Invalid Email"
                     valid = false
                 }
-
+                onRegisterClick()
             },
             modifier = Modifier.fillMaxWidth()
         ) {

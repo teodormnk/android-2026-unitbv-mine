@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -35,12 +36,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cst.unitbvfmi2026.util.isValidEmail
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun LogInScreen(
     modifier: Modifier = Modifier,
-    onRegisterClick: ()->Unit = {}
-
+    onRegisterClick: ()->Unit = {},
+    onLoginClick: ()->Unit = {},
+    isLoading: Boolean = false,
+    errorMsg: String? = null
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -144,11 +148,26 @@ fun LogInScreen(
         )
         Button(
             {
+                onLoginClick()
             },
-            modifier=Modifier.fillMaxWidth()
+            modifier=Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text("Login")
+            when (isLoading) {
+                true -> CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+                false -> Text("Login")
+            }
         }
+        errorMsg?.let{error->
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+            Text(error)
+        }
+
         Spacer(
             modifier = Modifier.height(16.dp)
 
