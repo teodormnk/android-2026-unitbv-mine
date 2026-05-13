@@ -2,14 +2,17 @@ package cst.unitbvfmi2026.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
@@ -26,11 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import cst.unitbvfmi2026.data.entities.UserEntity
 import cst.unitbvfmi2026.util.isValidEmail
 import cst.unitbvfmi2026.util.isValidPassword
@@ -49,6 +55,14 @@ fun UsersScreen(viewModel: UsersViewModel = viewModel())
         item {
             UserScreenHeader(viewModel)
         }
+        item{
+            Button(
+                onClick = { viewModel.loadUsers() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Load users")
+            }
+        }
         items(users.value){ user -> //un fel de foreach()
             UserCell(user)
         }
@@ -58,20 +72,30 @@ fun UsersScreen(viewModel: UsersViewModel = viewModel())
 @Composable
 fun UserCell(user: UserEntity)
 {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ){
-        Text(
-            text = user.name,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium
+        AsyncImage(
+            model = user.avatar,
+            contentDescription = "${user.name} avatar",
+            modifier = Modifier.size(50.dp).clip(CircleShape),
+            contentScale = ContentScale.Crop // daca poza nu incape in size, face scale la poza ca sa umple tot containerul
         )
-        Text(
-            text = user.email,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),//f - float, pt a nu crea evidenta pt fiecare culoare
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            Text(
+                text = user.name,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = user.email,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),//f - float, pt a nu crea evidenta pt fiecare culoare
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 @Composable

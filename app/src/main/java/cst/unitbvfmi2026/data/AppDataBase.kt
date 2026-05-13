@@ -13,7 +13,7 @@ import cst.unitbvfmi2026.data.entities.UserEntity
 
 @Database(
     entities = [UserEntity::class, AddressEntity::class],
-    version = 2
+    version = 3
 )
 abstract class AppDataBase : RoomDatabase() {
     abstract fun userDao(): UserDao
