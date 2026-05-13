@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.compose)
@@ -21,6 +23,18 @@ android {
 		versionName = "1.0.2"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+		//load the values from .properties file
+		val keystoreFile = project.rootProject.file("local.properties")
+		val properties = Properties()
+		properties.load(keystoreFile.inputStream())
+
+		//return empty key in case something goes wrong
+		val apiKey = properties.getProperty("reqres_key") ?: ""
+		buildConfigField(
+			type = "String",
+			name = "reqres_key",
+			value = apiKey
+		)
 	}
 
 	buildTypes {
@@ -70,4 +84,9 @@ dependencies {
 	implementation(platform(libs.firebase.bom))
 	implementation(libs.firebase.analytics)
 	implementation(libs.firebase.auth)
+	implementation(libs.retrofit)
+	implementation(libs.retrofit.converter.gson)
+	implementation(libs.okhttp.logging.interceptor)
+	implementation(libs.kotlinx.coroutines.android)
+	implementation(libs.coil.compose)
 }
