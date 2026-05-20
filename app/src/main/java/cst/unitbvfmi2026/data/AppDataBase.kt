@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cst.unitbvfmi2026.BuildConfig
+import cst.unitbvfmi2026.data.dao.AddressDao
 import cst.unitbvfmi2026.data.dao.UserDao
 import cst.unitbvfmi2026.data.entities.AddressEntity
 import cst.unitbvfmi2026.data.entities.UserEntity
@@ -17,6 +18,7 @@ import cst.unitbvfmi2026.data.entities.UserEntity
 )
 abstract class AppDataBase : RoomDatabase() {
     abstract fun userDao(): UserDao
+    abstract fun addressDao(): AddressDao
 
     //in Kotlin NU exista static, dar exista companion object
     companion object {

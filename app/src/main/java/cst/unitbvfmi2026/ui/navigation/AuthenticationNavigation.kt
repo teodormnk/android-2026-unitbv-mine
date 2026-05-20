@@ -7,10 +7,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import cst.unitbvfmi2026.MainActivity
+import cst.unitbvfmi2026.ui.screens.AddressesScreen
 import cst.unitbvfmi2026.ui.screens.HomeScreen
 import cst.unitbvfmi2026.ui.screens.LogInScreen
 import cst.unitbvfmi2026.ui.screens.RegisterScreen
@@ -62,16 +65,28 @@ fun AuthenticationNavigation(
                 errorMessage = authState.errorMessage
             )
         }
-        composable("usersScreen")
+        composable("usersScreen/{addressId}", //mod preluare param si il dam apelului de functie Composable
+            arguments = listOf(
+                navArgument("addressId"){
+                    type = NavType.LongType
+                }
+            ))
         {
-            UsersScreen()
+            val addressId = it.arguments?.getLong("addressId") ?: 0
+            UsersScreen(addressId = addressId)
+        }
+        composable("addressesScreen")
+        {
+            AddressesScreen{ address -> //rename "it"
+                navController.navigate("usersScreen/${address.id}")//merge direct asa, la lambda
+            }
         }
         composable("homeScreen") {
             //HomeScreen(authViewModel::logout)//referinta catre logout din AuthViewModel, care are aceeasi semnatura => nu mai trebuie declarata alta functie lambda pt asta
             val context = LocalContext.current//definit de componenta in care se afla authNav
             HomeScreen(
-                goToUsers = {
-                    navController.navigate("usersScreen")
+                goToAddresses = {
+                    navController.navigate("addressesScreen")
                 },
                 logout = {
                     authViewModel.logout()

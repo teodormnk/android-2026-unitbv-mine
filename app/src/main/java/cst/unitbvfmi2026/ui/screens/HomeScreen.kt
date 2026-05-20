@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen(
     logout: () -> Unit = {},
-    goToUsers: () -> Unit = {}
+    goToAddresses: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -47,10 +47,10 @@ fun HomeScreen(
             modifier = Modifier.height(24.dp)
         )
         Button(
-            onClick = goToUsers,
+            onClick = goToAddresses,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Go to Users")
+            Text("Go to Addresses")
         }
     }
 }

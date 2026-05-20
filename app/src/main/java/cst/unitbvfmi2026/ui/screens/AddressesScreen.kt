@@ -1,23 +1,22 @@
 package cst.unitbvfmi2026.ui.screens
 
-import android.app.Application
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -30,26 +29,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import cst.unitbvfmi2026.data.entities.UserEntity
-import cst.unitbvfmi2026.util.isValidEmail
-import cst.unitbvfmi2026.util.isValidPassword
-import cst.unitbvfmi2026.viewModels.UsersViewModel
+import cst.unitbvfmi2026.data.entities.AddressEntity
+import cst.unitbvfmi2026.util.isValidLocation
+import cst.unitbvfmi2026.viewModels.AddressesViewModel
 
 @Composable
-fun UsersScreen(addressId: Long)
-{
-    val app = LocalContext.current.applicationContext as Application // clasa reprezentativa pentru procesul aplicatiei noastre (stack principal pentru activ aplicatiei, creata la inceputul executiei aplicatiei)
-    val viewModel = viewModel<UsersViewModel>(factory = UsersViewModel.factory(app, addressId = addressId))
-    val users = viewModel.users.collectAsState(null)
+fun AddressesScreen(viewModel: AddressesViewModel = viewModel(), onAddressClick: (AddressEntity) -> Unit = {}) {
+    val addresses = viewModel.addresses.collectAsState(emptyList())
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -57,58 +48,45 @@ fun UsersScreen(addressId: Long)
         verticalArrangement = Arrangement.spacedBy(16.dp) //pune intre fiecare elem cate un spatiu de 16 dp
     ) {
         item {
-            UserScreenHeader(viewModel)
+            AddressesScreenHeader(viewModel)
         }
-        item{
-            Button(
-                onClick = { viewModel.loadUsers() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Load users")
-            }
-        }
-        items(users.value?.users?: emptyList()){ user -> //un fel de foreach()
-            UserCell(user)
+        items(addresses.value) { address -> //un fel de foreach()
+            AddressCell(address, onAddressClick)
         }
     }
 }
 
 @Composable
-fun UserCell(user: UserEntity)
-{
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-        AsyncImage(
-            model = user.avatar,
-            contentDescription = "${user.name} avatar",
-            modifier = Modifier.size(50.dp).clip(CircleShape),
-            contentScale = ContentScale.Crop // daca poza nu incape in size, face scale la poza ca sa umple tot containerul
-        )
+fun AddressCell(address: AddressEntity, onClick: (AddressEntity) -> Unit = {}) {
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = { onClick(address) }),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+    )
+    {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ){
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
             Text(
-                text = user.name,
+                text = address.city,
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = user.email,
+                text = address.country,
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),//f - float, pt a nu crea evidenta pt fiecare culoare
                 style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
+
 @Composable
-fun UserScreenHeader(viewModel: UsersViewModel)
-{
-    var email by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var nameError by remember { mutableStateOf<String?>(null) }
+fun AddressesScreenHeader(viewModel: AddressesViewModel) {
+    var city by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
+    var cityError by remember { mutableStateOf<String?>(null) }
+    var countryError by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -124,28 +102,28 @@ fun UserScreenHeader(viewModel: UsersViewModel)
             modifier = Modifier.height(32.dp)
         )
         OutlinedTextField(
-            value = email,
+            value = city,
             onValueChange = { newValue ->
-                email = newValue//primeste val scrisa in field
-                emailError = null
+                city = newValue//primeste val scrisa in field
+                cityError = null
             },
             label = {
-                Text("Email")
+                Text("City")
             },
             leadingIcon = {
                 Icon(
-                    Icons.Default.Email,
+                    Icons.Default.LocationCity,
                     contentDescription = null
                 )//content description ajuta la teste unitare
             },
-            isError = emailError?.let {
+            isError = cityError?.let {
                 true
             } ?: false,
-            supportingText = emailError?.let { { Text(it) } },
+            supportingText = cityError?.let { { Text(it) } },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email, //tastatura speciala cu @ usor accesibil (langa space)
+                keyboardType = KeyboardType.Text, //tastatura speciala cu @ usor accesibil (langa space)
                 imeAction = ImeAction.Next//face butonul de "Enter" sa faca "Next"
             )
         )
@@ -154,24 +132,24 @@ fun UserScreenHeader(viewModel: UsersViewModel)
 
         )
         OutlinedTextField(
-            value = name,
+            value = country,
             onValueChange = { newValue ->
-                name = newValue//primeste val scrisa in field
-                nameError = null
+                country = newValue//primeste val scrisa in field
+                countryError = null
             },
             label = {
-                Text("Name")
+                Text("Country")
             },
             leadingIcon = {
                 Icon(
-                    Icons.Default.Person,
+                    Icons.Default.Map,
                     contentDescription = null
                 )//content description ajuta la teste unitare
             },
-            isError = nameError?.let {
+            isError = countryError?.let {
                 true
             } ?: false,
-            supportingText = nameError?.let { { Text(it) } },
+            supportingText = countryError?.let { { Text(it) } },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
@@ -187,29 +165,29 @@ fun UserScreenHeader(viewModel: UsersViewModel)
         Button(
             {
                 var valid = true
-                if (!email.isValidEmail()) {
-                    emailError = "Invalid Email"
+                if (!city.isValidLocation()) {
+                    cityError = "Invalid city"
                     valid = false
                 }
-                if(!name.isValidPassword()) {
-                    nameError = "Invalid Name"
+                if (!country.isValidLocation()) {
+                    countryError = "Invalid country"
                     valid = false
                 }
                 if (valid) {
-                    emailError = null
-                    nameError = null
-                    viewModel.insert(email, name)
+                    cityError = null
+                    countryError = null
+                    viewModel.insert(city, country)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Add user")
+            Text("Add address")
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
-fun UsersScreenPreview()
-{
-    UsersScreen(0)
+fun AddressesScreenPreview() {
+    AddressesScreen()
 }

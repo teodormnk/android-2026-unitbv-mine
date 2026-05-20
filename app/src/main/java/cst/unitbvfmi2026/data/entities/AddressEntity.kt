@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class AddressEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(ARG_ID)
-    var id: Long,
+    var id: Long = 0,
     var city: String,
     var country: String
 )
