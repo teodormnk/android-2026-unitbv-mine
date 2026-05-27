@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cst.unitbvfmi2026.BuildConfig
 import cst.unitbvfmi2026.util.isValidEmail
 import cst.unitbvfmi2026.util.isValidPassword
 
@@ -54,6 +55,13 @@ fun LogInScreen(
     var passwordVisibility by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+
+    if(BuildConfig.DEBUG) // se aplica doar in mom in care suntem in dev (stie IDE-ul deja, in productie nu intra aici)
+    {
+        email = "eve.holt@reqres.in"
+        password = "cityslicka"
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -27,6 +27,7 @@ fun AuthenticationNavigation(
 ){
     val navController=rememberNavController()
     val authState by authViewModel.authState.collectAsState()//state-ul ajuta la actualiz UI-ului la modif param respectiv
+    val hasAuthState by authViewModel.hasAuth.collectAsState()
     val navigateToHome: () -> Unit = {
         navController.navigate("homeScreen") {
             popUpTo("login") {
@@ -35,7 +36,7 @@ fun AuthenticationNavigation(
             }
         }
     }//= {} pt ca e param de tip lambda func si il ia default
-    val startDestination = if (authViewModel.isLoggedIn) "homeScreen" else "login"
+    val startDestination = if (authViewModel.isLoggedIn || hasAuthState != null) "homeScreen" else "login"
     NavHost (
         navController= navController,
         startDestination = startDestination
@@ -46,7 +47,8 @@ fun AuthenticationNavigation(
                     navController.navigate("register")
                 },
                 onLoginClick = { email, password ->
-                    authViewModel.login(email, password, navigateToHome)
+                    //authViewModel.login(email, password, navigateToHome) - logare Firebase
+                    authViewModel.loginApi(email, password, navigateToHome) // logare API
                 },
                 isLoading = authState.isLoading,
                 errorMessage = authState.errorMessage
